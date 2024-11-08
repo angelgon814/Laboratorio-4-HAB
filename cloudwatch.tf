@@ -1,3 +1,121 @@
+# CloudWatch Dashboard para monitoreo integral
+resource "aws_cloudwatch_dashboard" "wordpress_dashboard" {
+  dashboard_name = "WordPress-Monitoring-Dashboard"
+
+  dashboard_body = jsonencode({
+    widgets = [
+      # EC2 Metrics
+      {
+        type   = "metric"
+        x      = 0
+        y      = 0
+        width  = 12
+        height = 6
+        properties = {
+          metrics = [
+            ["AWS/EC2", "CPUUtilization", "AutoScalingGroupName", aws_autoscaling_group.wordpress.name],
+            [".", "NetworkIn", ".", "."],
+            [".", "NetworkOut", ".", "."],
+            [".", "DiskReadBytes", ".", "."],
+            [".", "DiskWriteBytes", ".", "."]
+          ]
+          period = 300
+          stat   = "Average"
+          region = data.aws_region.current.name
+          title  = "EC2 Metrics"
+        }
+      },
+      # RDS Metrics
+      {
+        type   = "metric"
+        x      = 12
+        y      = 0
+        width  = 12
+        height = 6
+        properties = {
+          metrics = [
+            ["AWS/RDS", "CPUUtilization", "DBInstanceIdentifier", aws_db_instance.wordpress.id],
+            [".", "FreeStorageSpace", ".", "."],
+            [".", "ReadIOPS", ".", "."],
+            [".", "WriteIOPS", ".", "."],
+            [".", "DatabaseConnections", ".", "."]
+          ]
+          period = 300
+          stat   = "Average"
+          region = data.aws_region.current.name
+          title  = "RDS Metrics"
+        }
+      },
+      # ElastiCache Redis Metrics
+      {
+        type   = "metric"
+        x      = 0
+        y      = 6
+        width  = 12
+        height = 6
+        properties = {
+          metrics = [
+            ["AWS/ElastiCache", "CPUUtilization", "CacheClusterId", aws_elasticache_cluster.wordpress.id],
+            [".", "FreeableMemory", ".", "."],
+            [".", "NetworkBytesIn", ".", "."],
+            [".", "NetworkBytesOut", ".", "."],
+            [".", "CacheHits", ".", "."],
+            [".", "CacheMisses", ".", "."]
+          ]
+          period = 300
+          stat   = "Average"
+          region = data.aws_region.current.name
+          title  = "ElastiCache Metrics"
+        }
+      },
+      # ALB Metrics
+      {
+        type   = "metric"
+        x      = 12
+        y      = 6
+        width  = 12
+        height = 6
+        properties = {
+          metrics = [
+            ["AWS/ApplicationELB", "RequestCount", "LoadBalancer", aws_lb.external.arn_suffix],
+            [".", "TargetResponseTime", ".", "."],
+            [".", "HTTPCode_Target_2XX_Count", ".", "."],
+            [".", "HTTPCode_Target_4XX_Count", ".", "."],
+            [".", "HTTPCode_Target_5XX_Count", ".", "."]
+          ]
+          period = 300
+          stat   = "Sum"
+          region = data.aws_region.current.name
+          title  = "ALB Metrics"
+        }
+      },
+      # EFS Metrics
+      {
+        type   = "metric"
+        x      = 0
+        y      = 12
+        width  = 12
+        height = 6
+        properties = {
+          metrics = [
+            ["AWS/EFS", "TotalIOBytes", "FileSystemId", aws_efs_file_system.wordpress_efs.id],
+            [".", "PermittedThroughput", ".", "."],
+            [".", "StorageBytes", ".", "."],
+            [".", "ClientConnections", ".", "."]
+          ]
+          period = 300
+          stat   = "Average"
+          region = data.aws_region.current.name
+          title  = "EFS Metrics"
+        }
+      }
+    ]
+  })
+}
+
+
+
+
 # Grupo de logs de CloudWatch
 resource "aws_cloudwatch_log_group" "wordpress" {
   name              = "/aws/wordpress"
