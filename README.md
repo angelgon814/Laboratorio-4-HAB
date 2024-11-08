@@ -49,23 +49,27 @@ Se requiere configurar el plugin S3 Offload Media para mover archivos multimedia
 Evaluada la opción de Memcached vs Redis para caché de objetos
 Se eligió Redis por mejor integración con WordPress y características adicionales
 El código base para S3 está en s3.tf pero falta la configuración en WordPress
+
 b) CloudFront CDN:
 
 Se ha desarrollado el código en cloudfront.tf
 Pendiente la integración completa con el sitio WordPress
 El código está listo para despliegue pero requiere ajustes finales
+
 c) AWS Secrets Manager:
 
 Código base implementado en secretmanager.tf
 Pendiente la obtención de credenciales RDS en el user-data de EC2
 Se utiliza generación aleatoria de nombres para evitar conflictos
 Esto permite múltiples destroy/apply sin problemas de nombres duplicados
+
 d) Backup y Restauración:
 
 Se implementó la restauración desde un snapshot de RDS existente
 Esto permite preservar toda la configuración previa de WordPress
 El snapshot contiene la estructura de la base de datos y los datos
 Facilita la migración y el despliegue manteniendo la configuración existente
+
 Nota: A pesar de estas limitaciones, la arquitectura base funciona correctamente y está lista para mejoras incrementales.
 
 Muchas gracias por todas las clases y todo los conocimientos que nos has dado!
